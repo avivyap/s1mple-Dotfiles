@@ -364,4 +364,4 @@ modules-left = bspwm other_module
 [module/ethernet]
 type = custom/script
 interval = 2
-exec = /home/avivyap/.config/bin/ethernet.sh
+exec = /home/$USER/.config/bin/ethernet.sh
