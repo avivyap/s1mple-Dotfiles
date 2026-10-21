@@ -130,7 +130,7 @@ CUSTOM
 #Custom move/resize
 
 alt + ctrl + {j,k,i,l}
-	/home/avivyap/.config/bspwm/scripts/bspwm_resize {west,south,north,east}
+	/home/$USER/.config/bspwm/scripts/bspwm_resize {west,south,north,east}
 
 
 super + Escape
