@@ -17,15 +17,16 @@ orangeColour="\e[38;5;208m\033[1m"
 whiteColour="\e[0;97m\033[1m"
 whiteUltra="\e[38;5;231m"
 
+cd "$(dirname "$0")"
+
 
 trap ctrl_c INT
 
 function ctrl_c(){
 
         echo -e "${redColour}[!] Saliendo.......${endColour}"
-        exit 1
         tput cnorm
-
+        exit 1
 }
 
 function bspwm(){
@@ -35,13 +36,14 @@ function bspwm(){
 	sudo apt install bspwm -y > /dev/null 2>&1
 	sleep 1
 	sudo apt-get install libxcb-xinerama0-dev libxcb-icccm4-dev libxcb-randr0-dev libxcb-util0-dev libxcb-ewmh-dev libxcb-keysyms1-dev libxcb-shape0-dev
-	sleep1
+	sleep 1
 	sudo apt install libxcb-xkb-dev
 	echo -e "\n${purpleColour}[+]${endColour}${blueColour} Configurate bspwm...${endColour}\n"
-	git clone https://github.com/baskerville/bspwm.git > $HOME
+	git clone https://github.com/baskerville/bspwm.git $HOME/bspwm
 	sleep 1
-	cd $HOME/bspwm && make && sudo make install
+	(cd $HOME/bspwm && make && sudo make install)
 	sleep 1
+	mkdir -p $HOME/.config
 	mv .config/bspwm $HOME/.config/
 	sleep 1
 
@@ -52,10 +54,11 @@ function sxhkd(){
 	sleep 1; clear
 	echo -e "\n${purpleColour}[+]${endColour}${blueColour} Installing sxhkd and dependences...${endColour}\n"
 	sudo apt-get install libxcb1-dev libxcb-xkb-dev libxkbcommon-dev libxcb-util0-dev libxcb-keysyms1-dev libxcb-xinerama0-dev libx11-dev pkg-config
-	git clone https://github.com/baskerville/sxhkd.git > $HOME
+	git clone https://github.com/baskerville/sxhkd.git $HOME/sxhkd
 	sleep 1
-	cd $HOME/sxhkd && make && sudo make install
+	(cd $HOME/sxhkd && make && sudo make install)
 	sleep 1
+	mkdir -p $HOME/.config/sxhkd
 	mv .config/sxhkdrc $HOME/.config/sxhkd/
 
 }
@@ -66,8 +69,8 @@ function mixed_configurations(){
 	echo -e "\n${purpleColour}[+]${endColour}${blueColour} Applying configurations...${endColour}\n"
 	sleep 1
 	mkdir -p ~/.config/{bspwm,sxhkd}
-	cp /usr/share/doc/bspwm/examples/bspwmrc ~/.config/bspwm/
-	cp /usr/share/doc/bspwm/examples/sxhkdrc ~/.config/sxhkd/
+	cp -n /usr/share/doc/bspwm/examples/bspwmrc ~/.config/bspwm/
+	cp -n /usr/share/doc/bspwm/examples/sxhkdrc ~/.config/sxhkd/
 	chmod u+x ~/.config/bspwm/bspwmrc
 
 	mv .config/.xinitrc $HOME
@@ -89,12 +92,12 @@ function others(){
 	cp .config/picom.conf $HOME/.config/picom.conf
 	echo -e "\n${greenColour}[V]${endColour}${blueColour} Everything configured correctly${endColour}\n"
 	echo -e "\n${purpleColour}[+]${endColour}${blueColour} Configuring fonts...${endColour}\n"
-	sleep 1 && mv fonts  /usr/local/share/
+	sleep 1 && sudo mv fonts  /usr/local/share/ && fc-cache -fv > /dev/null 2>&1
 	echo -e "\n${greenColour}[V]${endColour}${blueColour} Everything configured correctly${endColour}\n"
 
 	#####
 
-	sudo mv bin ~/.config
+	mv bin ~/.config
 	sleep 1; echo -e "${purpleColour}[+]${endColour}${blueColour} Installing zsh...${endColour}\n"
 	sleep 1; sudo apt install zsh > /dev/null 2>&1 && echo -e "${greenColour}[V]${endColour}${blueColour} Installed correctly${endColour}"
 
@@ -106,12 +109,13 @@ function polybar(){
 	sudo apt install build-essential git cmake cmake-data pkg-config python3-sphinx python3-packaging libuv1-dev libcairo2-dev libxcb1-dev libxcb-util0-dev libxcb-randr0-dev libxcb-composite0-dev python3-xcbgen xcb-proto libxcb-image0-dev libxcb-ewmh-dev libxcb-icccm4-dev
 
 	sleep 1
-	sudo apt install build-essential git cmake cmake-data pkg-config python3-sphinx python3-packaging libuv1-dev libcairo2-dev libxcb1-dev libxcb-util0-dev libxcb-randr0-dev libxcb-composite0-dev python3-xcbgen xcb-proto libxcb-image0-dev libxcb-ewmh-dev libxcb-icccm4-dev
-
-	sleep 1
-	sudo git clone https://github.com/polybar/polybar /opt
+	sudo git clone --recursive https://github.com/polybar/polybar /opt/polybar
 	sleep 1
 	sudo cmake -S /opt/polybar -B /opt/polybar/build
+	sleep 1
+	sudo make -C /opt/polybar/build -j$(nproc)
+	sleep 1
+	sudo make -C /opt/polybar/build install
 	sleep 1
 
 	echo -e "\n${greenColour}[V]${endColour}${blueColour} Polybar successfully installed${endColour}\n"
@@ -121,16 +125,16 @@ function powerlevel10k(){
 
 	sleep 1;clear
 	echo -e "\n${purpleColour}[+]${endColour}${blueColour} Configuring powerlevel10k${endColour}\n"
-	git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~
-	rm ~/powerlevel10k/internal/p10k.zsh; mv .config/p10k.zsh ~/powerlevel10k/internal/
-	sleep 1;sudo usermod --shell /ruta/zsh $USER
+	git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
+	mv .config/p10k.zsh ~/.p10k.zsh
+	sleep 1;sudo usermod --shell "$(which zsh)" $USER
 	echo -e "\n${purpleColour}[+]${endColour}${blueColour} Installing others tools...${endColour}\n"
 	sleep 1;sudo apt install lsd >/dev/null 2>&1
 	sleep 1; sudo apt-get install zsh-syntax-highlighting -y > /dev/null 2>&1
-	sleep 1; sudo chown $USER:$USER zsh-syntax-highlighting/ -R
-	sleep 1; git clone --single-branch https://github.com/gpakosz/.tmux.git
-	sleep 1; ln -s -f .tmux/.tmux.conf
-	sleep 1; cp .tmux/.tmux.conf.local .
+	sleep 1; sudo chown $USER:$USER /usr/share/zsh-syntax-highlighting/ -R
+	sleep 1; git clone --single-branch https://github.com/gpakosz/.tmux.git ~/.tmux
+	sleep 1; ln -s -f ~/.tmux/.tmux.conf ~/.tmux.conf
+	sleep 1; cp ~/.tmux/.tmux.conf.local ~/
 	echo -e "\n${greenColour}[V]${endColour}${blueColour} TMUX Configurated${endColour}\n"
 	echo -e "\n${purpleColour}[+]${endColour}${blueColour} Installing bat...${endColour}\n"
 	sudo dpkg -i .config/bat_0.26.1_amd64.deb > /dev/null 2>&1
