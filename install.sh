@@ -114,8 +114,9 @@ function others(){
 	done
 	[ -f .config/gnome-terminal.dconf ] && dconf load /org/gnome/terminal/legacy/ < .config/gnome-terminal.dconf
 	dconf write /org/gnome/terminal/legacy/default-show-menubar false
-	# el export trae use-theme-colors=false, que en el Parrot nuevo deja la terminal en blanco; con true usa los colores oscuros del tema
-	dconf write /org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9/use-theme-colors true
+	# el export no trae los colores y en el Parrot nuevo el defecto es blanco; la principal se ve con fondo negro y texto blanco
+	dconf write /org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9/background-color "'#000000'"
+	dconf write /org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9/foreground-color "'#ffffff'"
 	sleep 1; echo -e "${purpleColour}[+]${endColour}${blueColour} Installing zsh...${endColour}\n"
 	sleep 1; sudo apt install zsh > /dev/null 2>&1 && echo -e "${greenColour}[V]${endColour}${blueColour} Installed correctly${endColour}"
 
@@ -139,9 +140,11 @@ function polybar(){
 		sudo make -C /opt/polybar/build install
 	fi
 	mkdir -p $HOME/.config/polybar
-	mv .config/polybar/config $HOME/.config/polybar/config.ini
-	sed -i "s|/home/avivyap/|$HOME/|g" $HOME/.config/polybar/config.ini
-	printf '%s\n' '#!/usr/bin/env bash' 'killall -q polybar' 'while pgrep -u $UID -x polybar >/dev/null; do sleep 1; done' 'polybar parrot &' > $HOME/.config/polybar/launch.sh
+	# igual que en la maquina principal: tu config reemplaza el archivo "config" que trae Parrot
+	mv .config/polybar/config $HOME/.config/polybar/config
+	sed -i "s|/home/avivyap/|$HOME/|g" $HOME/.config/polybar/config
+	rm -f $HOME/.config/polybar/config.ini
+	printf '%s\n' '#!/usr/bin/env bash' 'killall -q polybar' 'while pgrep -u $UID -x polybar >/dev/null; do sleep 1; done' 'polybar -l info -c $HOME/.config/polybar/config parrot >> /tmp/polybar.log 2>&1 &' > $HOME/.config/polybar/launch.sh
 	chmod u+x $HOME/.config/polybar/launch.sh
 	sleep 1
 
