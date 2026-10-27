@@ -180,7 +180,6 @@ function powerlevel10k(){
 function main(){
 
 	tput civis
-	sudo apt update
 	bspwm
 	sxhkd
 	mixed_configurations
