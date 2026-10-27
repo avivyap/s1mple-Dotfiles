@@ -114,6 +114,8 @@ function others(){
 	done
 	[ -f .config/gnome-terminal.dconf ] && dconf load /org/gnome/terminal/legacy/ < .config/gnome-terminal.dconf
 	dconf write /org/gnome/terminal/legacy/default-show-menubar false
+	# el export trae use-theme-colors=false, que en el Parrot nuevo deja la terminal en blanco; con true usa los colores oscuros del tema
+	dconf write /org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9/use-theme-colors true
 	sleep 1; echo -e "${purpleColour}[+]${endColour}${blueColour} Installing zsh...${endColour}\n"
 	sleep 1; sudo apt install zsh > /dev/null 2>&1 && echo -e "${greenColour}[V]${endColour}${blueColour} Installed correctly${endColour}"
 
