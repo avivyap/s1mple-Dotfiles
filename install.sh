@@ -37,7 +37,7 @@ function bspwm(){
 	echo -e "\n${purpleColour}[+]${endColour}${blueColour} Installing bspwm and dependences...${endColour}\n"
 	sudo apt install bspwm -y > /dev/null 2>&1
 	sleep 1
-	sudo apt-get install libxcb-xinerama0-dev libxcb-icccm4-dev libxcb-randr0-dev libxcb-util0-dev libxcb-ewmh-dev libxcb-keysyms1-dev libxcb-shape0-dev
+	sudo apt-get install libxcb-xinerama0-dev libxcb-icccm4-dev libxcb-randr0-dev libxcb-util-dev libxcb-ewmh-dev libxcb-keysyms1-dev libxcb-shape0-dev
 	sleep 1
 	sudo apt install libxcb-xkb-dev
 	echo -e "\n${purpleColour}[+]${endColour}${blueColour} Configurate bspwm...${endColour}\n"
@@ -55,7 +55,7 @@ function sxhkd(){
 
 	sleep 1; clear
 	echo -e "\n${purpleColour}[+]${endColour}${blueColour} Installing sxhkd and dependences...${endColour}\n"
-	sudo apt-get install libxcb1-dev libxcb-xkb-dev libxkbcommon-dev libxcb-util0-dev libxcb-keysyms1-dev libxcb-xinerama0-dev libx11-dev pkg-config
+	sudo apt-get install libxcb1-dev libxcb-xkb-dev libxkbcommon-dev libxcb-util-dev libxcb-keysyms1-dev libxcb-xinerama0-dev libx11-dev pkg-config
 	git clone https://github.com/baskerville/sxhkd.git $HOME/sxhkd
 	sleep 1
 	(cd $HOME/sxhkd && make && sudo make install)
@@ -96,6 +96,8 @@ function others(){
 	sleep 1
 	mkdir -p ~/.config/picom
 	cp .config/picom.conf $HOME/.config/picom.conf
+	# picom 12 exige indicar el backend; xrender es el que usaban las versiones antiguas por defecto
+	grep -q '^backend' $HOME/.config/picom.conf || printf '\nbackend = "xrender";\n' >> $HOME/.config/picom.conf
 	echo -e "\n${greenColour}[V]${endColour}${blueColour} Everything configured correctly${endColour}\n"
 	echo -e "\n${purpleColour}[+]${endColour}${blueColour} Configuring fonts...${endColour}\n"
 	sleep 1 && sudo mv fonts  /usr/local/share/ && fc-cache -fv > /dev/null 2>&1
@@ -120,16 +122,20 @@ function others(){
 function polybar(){
 
 	echo -e "\n${purpleColour}[+]${endColour}${blueColour} Installing and configuring Polybar${endColour}\n"
-	sudo apt install build-essential git cmake cmake-data pkg-config python3-sphinx python3-packaging libuv1-dev libcairo2-dev libxcb1-dev libxcb-util0-dev libxcb-randr0-dev libxcb-composite0-dev python3-xcbgen xcb-proto libxcb-image0-dev libxcb-ewmh-dev libxcb-icccm4-dev
+	sudo apt install polybar -y
+	if ! command -v polybar > /dev/null 2>&1; then
+		echo -e "\n${yellowColour}[!]${endColour}${blueColour} Polybar not available with apt, compiling it...${endColour}\n"
+		sudo apt install build-essential git cmake cmake-data pkg-config python3-sphinx python3-packaging libuv1-dev libcairo2-dev libxcb1-dev libxcb-util-dev libxcb-randr0-dev libxcb-composite0-dev python3-xcbgen xcb-proto libxcb-image0-dev libxcb-ewmh-dev libxcb-icccm4-dev
 
-	sleep 1
-	sudo git clone --recursive https://github.com/polybar/polybar /opt/polybar
-	sleep 1
-	sudo cmake -S /opt/polybar -B /opt/polybar/build
-	sleep 1
-	sudo make -C /opt/polybar/build -j$(nproc)
-	sleep 1
-	sudo make -C /opt/polybar/build install
+		sleep 1
+		sudo git clone --recursive https://github.com/polybar/polybar /opt/polybar
+		sleep 1
+		sudo cmake -S /opt/polybar -B /opt/polybar/build
+		sleep 1
+		sudo make -C /opt/polybar/build -j$(nproc)
+		sleep 1
+		sudo make -C /opt/polybar/build install
+	fi
 	mkdir -p $HOME/.config/polybar
 	mv .config/polybar/config $HOME/.config/polybar/config.ini
 	sed -i "s|/home/avivyap/|$HOME/|g" $HOME/.config/polybar/config.ini
@@ -137,7 +143,11 @@ function polybar(){
 	chmod u+x $HOME/.config/polybar/launch.sh
 	sleep 1
 
-	echo -e "\n${greenColour}[V]${endColour}${blueColour} Polybar successfully installed${endColour}\n"
+	if command -v polybar > /dev/null 2>&1; then
+		echo -e "\n${greenColour}[V]${endColour}${blueColour} Polybar successfully installed${endColour}\n"
+	else
+		echo -e "\n${redColour}[!] Polybar could NOT be installed, check the errors above${endColour}\n"
+	fi
 }
 
 function powerlevel10k(){
@@ -165,6 +175,7 @@ function powerlevel10k(){
 function main(){
 
 	tput civis
+	sudo apt update
 	bspwm
 	sxhkd
 	mixed_configurations
