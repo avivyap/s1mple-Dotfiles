@@ -98,6 +98,7 @@ function others(){
 	cp .config/picom.conf $HOME/.config/picom.conf
 	# picom 12 exige indicar el backend; xrender es el que usaban las versiones antiguas por defecto
 	grep -q '^backend' $HOME/.config/picom.conf || printf '\nbackend = "xrender";\n' >> $HOME/.config/picom.conf
+	grep -q '^vsync' $HOME/.config/picom.conf || printf 'vsync = false;\n' >> $HOME/.config/picom.conf
 	echo -e "\n${greenColour}[V]${endColour}${blueColour} Everything configured correctly${endColour}\n"
 	echo -e "\n${purpleColour}[+]${endColour}${blueColour} Configuring fonts...${endColour}\n"
 	sleep 1 && sudo mv fonts  /usr/local/share/ && fc-cache -fv > /dev/null 2>&1
@@ -109,14 +110,16 @@ function others(){
 	chmod u+x ~/.config/bin/*
 	mv wallpapers $HOME/wallpaper
 	echo -e "\n${purpleColour}[+]${endColour}${blueColour} Installing extra tools used by the configs...${endColour}\n"
-	for paquete in tmux dconf-cli gnome-terminal wmname i3lock-fancy scrub psmisc fonts-cantarell fonts-unifont fonts-font-awesome; do
+	for paquete in tmux dconf-cli mate-terminal wmname i3lock-fancy scrub psmisc fonts-cantarell fonts-unifont fonts-font-awesome; do
 		sudo apt install $paquete -y > /dev/null 2>&1
 	done
-	[ -f .config/gnome-terminal.dconf ] && dconf load /org/gnome/terminal/legacy/ < .config/gnome-terminal.dconf
-	dconf write /org/gnome/terminal/legacy/default-show-menubar false
-	# el export no trae los colores y en el Parrot nuevo el defecto es blanco; la principal se ve con fondo negro y texto blanco
-	dconf write /org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9/background-color "'#000000'"
-	dconf write /org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9/foreground-color "'#ffffff'"
+	# en tu principal "gnome-terminal" es en realidad MATE Terminal (gnome-terminal --version dice "Terminal de MATE")
+	if ! gnome-terminal --version 2>/dev/null | grep -qi mate; then
+		sudo ln -sf "$(command -v mate-terminal)" /usr/local/bin/gnome-terminal
+	fi
+	[ -f .config/mate-terminal.dconf ] && dconf load /org/mate/terminal/ < .config/mate-terminal.dconf
+	# tu principal es una maquina VMware con open-vm-tools-desktop instalado
+	[ "$(systemd-detect-virt 2>/dev/null)" = "vmware" ] && sudo apt install open-vm-tools-desktop -y > /dev/null 2>&1
 	sleep 1; echo -e "${purpleColour}[+]${endColour}${blueColour} Installing zsh...${endColour}\n"
 	sleep 1; sudo apt install zsh > /dev/null 2>&1 && echo -e "${greenColour}[V]${endColour}${blueColour} Installed correctly${endColour}"
 
@@ -180,6 +183,7 @@ function powerlevel10k(){
 function main(){
 
 	tput civis
+	sudo apt update
 	bspwm
 	sxhkd
 	mixed_configurations
