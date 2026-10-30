@@ -32,7 +32,6 @@ zstyle ':completion:*' menu select=long
 zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
 zstyle ':completion:*' use-compctl false
 zstyle ':completion:*' verbose true
-
 zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
 zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
 source ~/powerlevel10k/powerlevel10k.zsh-theme
@@ -45,7 +44,9 @@ source ~/powerlevel10k/powerlevel10k.zsh-theme
 #CUSTOM
 #------------------------------------------
 
-PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+setxkbmap es
+
+PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/share/doc/python3-impacket/examples:/.local/bin
 
 export _JAVA_AWT_VM_NONREPARENTING=1
 
@@ -56,14 +57,36 @@ export LANG=es_ES.UTF-8
 
 #functions
 
+function machine(){
+
+	mkdir {reconocimiento,scripts,credenciales}
+}
+
+
 function rmk(){
 	scrub -p dod $1; shred -zun 10 -v $1
 }
 
 
 function update(){
-	/home/$USER/virtual_python3/bin/python .actualizar.py
+	sudo ~/.actu.sh
 }
+
+function activate-python(){
+
+	source ~/virtual_python3/bin/activate
+
+}
+
+function cleanDocker(){
+
+	docker rm $(docker ps -aq) --force 2>/dev/null
+	docker rmi $(docker images -q) 2>/dev/null
+	docker network rm $(docker network ls -q) 2>/dev/null
+	docker volume rm $(docker volume ls -q) 2>/dev/null
+}
+
+
 
 
 #alias
@@ -72,7 +95,9 @@ alias ls="/usr/bin/lsd"
 alias cat="/usr/bin/bat"
 alias catn="/usr/bin/cat"
 alias catnl="/usr/bin/bat --paging=never"
+alias grep='grep --color=auto'
 
 #otros
 
 source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+export PATH="$PATH:$HOME/.local/bin"
