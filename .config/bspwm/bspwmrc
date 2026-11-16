@@ -4,7 +4,7 @@ sxhkd &
 killall compton
 sleep 2 && picom -b &
 wmname LG3D &
-feh --bg-fill /home/$USER/wallpaper/a.png
+feh --bg-fill /home/$USER/wallpaper/wall-07.webp
 ~/.config/polybar/launch.sh &
 
 bscp config pointer_modifier mod1
