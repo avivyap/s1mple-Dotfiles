@@ -28,6 +28,7 @@ My Parrot / bspwm setup, installed with a single command.
 - [What the script does](#what-the-script-does)
 - [After the installation](#after-the-installation)
 - [Customization](#customization)
+- [Changing the wallpaper](#changing-the-wallpaper)
 - [Troubleshooting](#troubleshooting)
 - [Restoring your old configuration](#restoring-your-old-configuration)
 - [Repository structure](#repository-structure)
@@ -216,7 +217,7 @@ Other details:
 |---|---|
 | Keybindings | `~/.config/sxhkd/sxhkdrc` (reload with `pkill -USR1 -x sxhkd`) |
 | Window gaps, borders, desktops, startup apps | `~/.config/bspwm/bspwmrc` |
-| Wallpaper | the `feh` line of `bspwmrc`, wallpapers are in `~/wallpaper` |
+| Wallpaper | the `feh` line of `bspwmrc` (see [Changing the wallpaper](#changing-the-wallpaper)) |
 | Bar modules and colours | `~/.config/polybar/config` |
 | Bar scripts | `~/.config/bin` |
 | Transparencies and shadows | `~/.config/picom.conf` |
@@ -225,6 +226,39 @@ Other details:
 | Terminal profile | MATE Terminal preferences, or edit `.config/mate-terminal.dconf` and load it with `dconf load /org/mate/terminal/ < .config/mate-terminal.dconf` |
 
 To change the wallpaper, replace the file name in the `feh --bg-fill` line of `bspwmrc` with any image of `~/wallpaper`.
+
+---
+
+## Changing the wallpaper
+
+The wallpapers are copied to `~/wallpaper` during the installation. The ones included in the repo are: `a.png`, `animelike.png`, `archkali.png`, `b.png`, `coche_amarillo.png`, `lofi-pixel.jpg`, `narutoog.jpg`, `purple-tree.jpg`, `test.png`, `wall-05.png`, `wall-07.webp`, `wall-09.webp`, `wall-10.webp` and `wallpaperarch.png`.
+
+**Try one right now** (it lasts until you restart bspwm):
+
+```bash
+feh --bg-fill ~/wallpaper/archkali.png
+```
+
+**Make it permanent.** Open `~/.config/bspwm/bspwmrc`, find the `feh` line and change the file name:
+
+```bash
+feh --bg-fill /home/$USER/wallpaper/a.png
+```
+
+For example, replace `a.png` with `purple-tree.jpg`. Then restart bspwm with `bspc wm -r`.
+
+**Use your own image.** Copy it to `~/wallpaper` and use its name in the `feh` line:
+
+```bash
+cp ~/Downloads/my-image.png ~/wallpaper/
+feh --bg-fill ~/wallpaper/my-image.png
+```
+
+`--bg-fill` fills the whole screen and crops what does not fit. Other modes are `--bg-scale` (stretches the image), `--bg-center` (centered, no scaling) and `--bg-max` (fits the image inside the screen, with borders).
+
+If you want the change to survive a new installation, also edit the `feh` line in `.config/bspwm/bspwmrc` of the repo, and put your image in the `wallpapers/` folder before you run `./install.sh`. The installer replaces `bspwmrc` with the one from the repo (it saves your old one in `~/dotfiles-backup-<date>`).
+
+If a `.webp` image does not load, convert it to PNG (for example with `convert image.webp image.png` from ImageMagick).
 
 ---
 
@@ -313,6 +347,7 @@ cp ~/dotfiles-backup-<date>/.config/picom.conf ~/.config/picom.conf
 - [Qué hace el script](#qué-hace-el-script)
 - [Después de la instalación](#después-de-la-instalación)
 - [Personalización](#personalización)
+- [Cambiar el fondo de pantalla](#cambiar-el-fondo-de-pantalla)
 - [Solución de problemas](#solución-de-problemas)
 - [Restaurar tu configuración anterior](#restaurar-tu-configuración-anterior)
 - [Estructura del repositorio](#estructura-del-repositorio)
@@ -503,7 +538,7 @@ Otros detalles:
 |---|---|
 | Atajos de teclado | `~/.config/sxhkd/sxhkdrc` (recarga con `pkill -USR1 -x sxhkd`) |
 | Separación y bordes de ventanas, escritorios, aplicaciones al inicio | `~/.config/bspwm/bspwmrc` |
-| Fondo de pantalla | la línea de `feh` de `bspwmrc`; los fondos están en `~/wallpaper` |
+| Fondo de pantalla | la línea de `feh` de `bspwmrc` (mira [Cambiar el fondo de pantalla](#cambiar-el-fondo-de-pantalla)) |
 | Módulos y colores de la barra | `~/.config/polybar/config` |
 | Scripts de la barra | `~/.config/bin` |
 | Transparencias y sombras | `~/.config/picom.conf` |
@@ -512,6 +547,39 @@ Otros detalles:
 | Perfil de la terminal | Preferencias de MATE Terminal, o edita `.config/mate-terminal.dconf` y cárgalo con `dconf load /org/mate/terminal/ < .config/mate-terminal.dconf` |
 
 Para cambiar el fondo de pantalla, sustituye el nombre del archivo en la línea `feh --bg-fill` de `bspwmrc` por cualquier imagen de `~/wallpaper`.
+
+---
+
+## Cambiar el fondo de pantalla
+
+Los fondos se copian a `~/wallpaper` durante la instalación. Los que trae el repo son: `a.png`, `animelike.png`, `archkali.png`, `b.png`, `coche_amarillo.png`, `lofi-pixel.jpg`, `narutoog.jpg`, `purple-tree.jpg`, `test.png`, `wall-05.png`, `wall-07.webp`, `wall-09.webp`, `wall-10.webp` y `wallpaperarch.png`.
+
+**Probar uno ahora mismo** (dura hasta que reinicies bspwm):
+
+```bash
+feh --bg-fill ~/wallpaper/archkali.png
+```
+
+**Dejarlo fijo.** Abre `~/.config/bspwm/bspwmrc`, busca la línea de `feh` y cambia el nombre del archivo:
+
+```bash
+feh --bg-fill /home/$USER/wallpaper/a.png
+```
+
+Por ejemplo, cambia `a.png` por `purple-tree.jpg`. Después reinicia bspwm con `bspc wm -r`.
+
+**Usar tu propia imagen.** Cópiala a `~/wallpaper` y pon su nombre en la línea de `feh`:
+
+```bash
+cp ~/Descargas/mi-imagen.png ~/wallpaper/
+feh --bg-fill ~/wallpaper/mi-imagen.png
+```
+
+`--bg-fill` rellena toda la pantalla y recorta lo que no cabe. Otros modos son `--bg-scale` (estira la imagen), `--bg-center` (centrada, sin escalar) y `--bg-max` (ajusta la imagen dentro de la pantalla, con bordes).
+
+Si quieres que el cambio sobreviva a una instalación nueva, edita también la línea de `feh` en `.config/bspwm/bspwmrc` del repo y pon tu imagen en la carpeta `wallpapers/` antes de ejecutar `./install.sh`. El instalador reemplaza `bspwmrc` por el del repo (guarda el tuyo en `~/dotfiles-backup-<fecha>`).
+
+Si una imagen `.webp` no carga, conviértela a PNG (por ejemplo con `convert imagen.webp imagen.png`, de ImageMagick).
 
 ---
 
